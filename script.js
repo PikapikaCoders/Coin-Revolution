@@ -7,7 +7,7 @@ var tickspeed = new Decimal(1)
 var knowledge = new Decimal(0)
 
 //Update
-function update() {
+function update(auto=true) {
     mult = new Decimal(1)
     if (tickspeed.gte(1000)) mult = mult.times(tickspeed.div(1000))
     if (rankBought.gte(1)) mult = mult.times(3)
@@ -27,7 +27,7 @@ function update() {
     if (collapseUpgrades[2]) changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x"+format(knowledge))
     if (collapseUpgrades[3]) changeElement("collapseUpgrade3", "<b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>Currently: "+format(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))))+" free upgrades")
 
-    automate()
+    if (auto) automate()
 }
 var updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
 
@@ -62,6 +62,7 @@ function tickUpgrade() {
         if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
         else cost = Decimal.pow(2, tickspeedBought).times(10)
         changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
+        update(false)
     }
 }
 
@@ -71,58 +72,49 @@ var rankCost = new Decimal(100)
 function rankUpgrade(reset=false) {
     if (!reset) {
         if (coin.gte(rankCost)) {
-        rankBought = rankBought.add(1)
-        mult = new Decimal(10)
-        if (rankBought.gte(30)) mult = Decimal.pow(10, rankBought.sub(29).max(0))
-        rankCost = rankCost.times(mult)
-        coin = new Decimal(0)
-        coinGain = new Decimal(1)
-        coinBest = new Decimal(0)
-        inflation = new Decimal(0)
-        tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
-        tickspeedBought = new Decimal(0)
-        if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
-        else cost = Decimal.pow(2, tickspeedBought).times(10)
-        changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
-        clearInterval(updateVar)
-        updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
-            
-        if (rankBought.eq(0)) nextEffect = "Coin production x3"
-        else if (rankBought.eq(1)) nextEffect = "Inflation formula x3"
-        else if (rankBought.eq(2)) nextEffect = "Tickspeed Upgrade base +0.3"
-        else if (rankBought.eq(4)) nextEffect = "Coin production x2 per rank"
-        else if (rankBought.eq(8)) nextEffect = "Automate Tickspeed Upgrade"
-        else if (rankBought.eq(14)) nextEffect = "Automate Rank Upgrade"
-        else if (rankBought.eq(29)) nextEffect = "Unlock Economy Collapse"
-        else nextEffect = "Progress to the next rank"
-    
-        if (rankBought.gte(0)) rankEffect = "Nothing"
-        if (rankBought.gte(1)) rankEffect = "Rank 1: Coin production x3"
-        if (rankBought.gte(2)) rankEffect = rankEffect+"<br>Rank 2: Inflation formula x3"
-        if (rankBought.gte(3)) rankEffect = rankEffect+"<br>Rank 3: Tickspeed Upgrade base +0.3"
-        if (rankBought.gte(5)) rankEffect = rankEffect+"<br>Rank 5: Coin production x2 per rank"
-        if (rankBought.gte(9)) rankEffect = rankEffect+"<br>Rank 9: Automate Tickspeed Upgrade"
-        if (rankBought.gte(15)) rankEffect = rankEffect+"<br>Rank 15: Automate Rank Upgrade"
-        if (rankBought.gte(30)) rankEffect = rankEffect+"<br>Rank 30: Unlock Economy Collapse"
-
-        if (rankBought.eq(30)) removeClass("collapseDiv", "locked")
-    
-        changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(rankCost)+" Coins")
-        changeElement("rankEffect", rankEffect)
+            rankBought = rankBought.add(1)
+            mult = new Decimal(10)
+            if (rankBought.gte(30)) mult = Decimal.pow(10, rankBought.sub(29).max(0))
+            rankCost = rankCost.times(mult)
+            rankUpdate() 
+            update(false)
         }
-    } else {
-        coin = new Decimal(0)
-        coinGain = new Decimal(1)
-        coinBest = new Decimal(0)
-        inflation = new Decimal(0)
-        tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
-        tickspeedBought = new Decimal(0)
-        if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
-        else cost = Decimal.pow(2, tickspeedBought).times(10)
-        changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
-        clearInterval(updateVar)
-        updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
     }
+    coin = new Decimal(0)
+    coinGain = new Decimal(1)
+    coinBest = new Decimal(0)
+    inflation = new Decimal(0)
+    tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
+    tickspeedBought = new Decimal(0)
+    if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
+    else cost = Decimal.pow(2, tickspeedBought).times(10)
+    changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
+    clearInterval(updateVar)
+    updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
+}
+function rankUpdate() {
+    if (rankBought.eq(0)) nextEffect = "Coin production x3"
+    else if (rankBought.eq(1)) nextEffect = "Inflation formula x3"
+    else if (rankBought.eq(2)) nextEffect = "Tickspeed Upgrade base +0.3"
+    else if (rankBought.eq(4)) nextEffect = "Coin production x2 per rank"
+    else if (rankBought.eq(8)) nextEffect = "Automate Tickspeed Upgrade"
+    else if (rankBought.eq(14)) nextEffect = "Automate Rank Upgrade"
+    else if (rankBought.eq(29)) nextEffect = "Unlock Economy Collapse"
+    else nextEffect = "Progress to the next rank"
+    
+    if (rankBought.gte(0)) rankEffect = "Nothing"
+    if (rankBought.gte(1)) rankEffect = "Rank 1: Coin production x3"
+    if (rankBought.gte(2)) rankEffect = rankEffect+"<br>Rank 2: Inflation formula x3"
+    if (rankBought.gte(3)) rankEffect = rankEffect+"<br>Rank 3: Tickspeed Upgrade base +0.3"
+    if (rankBought.gte(5)) rankEffect = rankEffect+"<br>Rank 5: Coin production x2 per rank"
+    if (rankBought.gte(9)) rankEffect = rankEffect+"<br>Rank 9: Automate Tickspeed Upgrade"
+    if (rankBought.gte(15)) rankEffect = rankEffect+"<br>Rank 15: Automate Rank Upgrade"
+    if (rankBought.gte(30)) rankEffect = rankEffect+"<br>Rank 30: Unlock Economy Collapse"
+
+    if (rankBought.eq(30)) removeClass("collapseDiv", "locked")
+    
+    changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(rankCost)+" Coins")
+    changeElement("rankEffect", rankEffect)
 }
 
 function collapse(reset=false) {

@@ -9,15 +9,18 @@
     <script src="node_modules/break_eternity.js/dist/break_eternity.js"></script>
     <script src="utils.js"></script>
     <script src="script.js"></script>
+    <script src="save.js"></script>
 </head>
  
 <body>
+    <p style="margin:0px; font-size: 10px">(Progress is auto-saved)</p>
     <h1 id="coins">You have 0.00 coins.</h1>
     <p id="inflation">0.00 total coins is translated into a 0.00% inflation, which is directly boosting your coin production by 1.00x.</p>
 
     <ul class="tabs">
         <li data-tab-target="#main" class="active tab" style="background-color:#d3d3d3">Main</li>
         <li data-tab-target="#economy-collapse" class="tab" style="background-color:#e0ff2e">Economy Collapse</li>
+        <li data-tab-target="#save" class="tab" style="background-color:#888888">Save</li>
     </ul>
 
     <div id="main" data-tab-content class="active">
@@ -52,6 +55,11 @@
                 <button class="upgrade sale" id="collapseUpgrade3" onclick="collapseUpgrade(3)"><b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>3.00e3 knowledge</button>
             </div>
         </div>
+    </div>
+
+    <div id="save" data-tab-content>
+        <h3>Press the button below to DELETE YOUR SAVE FILE. (Reset literally EVERYTHING)</h3>
+        <button class="prestige" onclick="deleteSaveFile()" style="font-size:20px">Delete Save File</button>
     </div>
 
     <script type="module">
