@@ -25,8 +25,17 @@ function update() {
     if (rankBought.gte(30) || knowledge.gte(0)) removeClass("collapseDiv", "locked")
     changeElement("knowledge", "You have "+format(knowledge)+" knowledge")
     changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)))+" knowledge")
-    if (collapseUpgrades[2]) changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x"+format(knowledge))
-    if (collapseUpgrades[3]) changeElement("collapseUpgrade3", "<b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>Currently: "+format(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))))+" free upgrades")
+    if (collapseUpgrades[1]) {
+        removeClass("collapseUpgrade1", "sale")
+    }
+    if (collapseUpgrades[2]) {
+        removeClass("collapseUpgrade2", "sale")
+        changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x"+format(knowledge))
+    }
+    if (collapseUpgrades[3]) {
+        removeClass("collapseUpgrade3", "sale")
+        changeElement("collapseUpgrade3", "<b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>Currently: "+format(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))))+" free upgrades")
+    }
 }
 var updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
 
@@ -159,7 +168,6 @@ function collapseUpgrade(id) {
     if (id == 1) {
         if (knowledge.gte(15) && !collapseUpgrades[1]) {
             knowledge = knowledge.sub(15)
-            removeClass("collapseUpgrade1", "sale")
             changeElement("collapseUpgrade1", "<b>Supersonic Speed</b><br>Tickspeed Upgrade base power +0.5")
             collapseUpgrades[1] = true
             collapse(true)
@@ -167,14 +175,12 @@ function collapseUpgrade(id) {
     } else if (id == 2) {
         if (knowledge.gte(500) && !collapseUpgrades[2]) {
             knowledge = knowledge.sub(600)
-            removeClass("collapseUpgrade2", "sale")
             collapseUpgrades[2] = true
             collapse(true)
         }
     } else if (id == 3) {
         if (knowledge.gte(3e3) && !collapseUpgrades[3]) {
             knowledge = knowledge.sub(3e3)
-            removeClass("collapseUpgrade3", "sale")
             collapseUpgrades[3] = true
             collapse(true)
         }
