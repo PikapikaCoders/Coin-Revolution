@@ -61,6 +61,7 @@ function tickUpgrade() {
         if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
         else cost = Decimal.pow(2, tickspeedBought).times(10)
         changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
+        update()
     }
 }
 
@@ -86,6 +87,7 @@ function rankUpgrade(reset=false) {
             changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
             clearInterval(updateVar)
             updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
+            update()
         }
     } else {
         coin = new Decimal(0)
@@ -99,6 +101,7 @@ function rankUpgrade(reset=false) {
         changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
         clearInterval(updateVar)
         updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
+        update()
     }
     
 }
