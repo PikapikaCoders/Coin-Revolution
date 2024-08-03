@@ -24,7 +24,7 @@ function update() {
 
     changeElement("knowledge", "You have "+format(knowledge)+" knowledge")
     changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)))+" knowledge")
-    if (collapseUpgrades[2]) changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x1.00")
+    if (collapseUpgrades[2]) changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x"+format(knowledge))
 
     automate()
 }
@@ -154,7 +154,7 @@ function collapseUpgrade(id) {
         if (knowledge.gte(15) && !collapseUpgrades[1]) {
             knowledge = knowledge.sub(15)
             removeClass("collapseUpgrade1", "sale")
-            changeElement("collapseUpgrade1", "Supersonic Speed</b><br>Tickspeed Upgrade base power +0.5")
+            changeElement("collapseUpgrade1", "<b>Supersonic Speed</b><br>Tickspeed Upgrade base power +0.5")
             collapseUpgrades[1] = true
             collapse(true)
         }
