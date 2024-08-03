@@ -7,7 +7,7 @@ var tickspeed = new Decimal(1)
 var knowledge = new Decimal(0)
 
 //Update
-function update(auto=true) {
+function update() {
     mult = new Decimal(1)
     if (tickspeed.gte(1000)) mult = mult.times(tickspeed.div(1000))
     if (rankBought.gte(1)) mult = mult.times(3)
@@ -26,8 +26,6 @@ function update(auto=true) {
     changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)))+" knowledge")
     if (collapseUpgrades[2]) changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x"+format(knowledge))
     if (collapseUpgrades[3]) changeElement("collapseUpgrade3", "<b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>Currently: "+format(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))))+" free upgrades")
-
-    if (auto) automate()
 }
 var updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
 
@@ -36,6 +34,7 @@ function automate() {
     if (rankBought.gte(9)) tickUpgrade()
     if (rankBought.gte(15)) rankUpgrade()
 }
+var automateVar = setInterval(automate, 100)
 
 //Tickspeed Upgrade
 var tickspeedBought = new Decimal(0)
@@ -62,7 +61,6 @@ function tickUpgrade() {
         if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
         else cost = Decimal.pow(2, tickspeedBought).times(10)
         changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
-        update(false)
     }
 }
 
@@ -88,7 +86,6 @@ function rankUpgrade(reset=false) {
             changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
             clearInterval(updateVar)
             updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
-            update(false)
         }
     } else {
         coin = new Decimal(0)
@@ -102,7 +99,6 @@ function rankUpgrade(reset=false) {
         changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
         clearInterval(updateVar)
         updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
-        update(false)
     }
     
 }
