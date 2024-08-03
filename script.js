@@ -25,6 +25,7 @@ function update() {
     changeElement("knowledge", "You have "+format(knowledge)+" knowledge")
     changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)))+" knowledge")
     if (collapseUpgrades[2]) changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x"+format(knowledge))
+    if (collapseUpgrades[3]) changeElement("collapseUpgrade3", "<b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>Currently: "+format(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))))+" free upgrades")
 
     automate()
 }
@@ -44,6 +45,11 @@ var getTickspeedBase = function() {
     if (collapseUpgrades[1]) tickspeedBase = tickspeedBase.add(0.5)
     return tickspeedBase
 }
+var getFreeTickspeed = function() {
+    free = new Decimal(0)
+    if (collapseUpgrades[3]) free = free.add(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))))
+    return free
+}
 function tickUpgrade() {
     if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
     else cost = Decimal.pow(2, tickspeedBought).times(10)
@@ -56,7 +62,6 @@ function tickUpgrade() {
         if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
         else cost = Decimal.pow(2, tickspeedBought).times(10)
         changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
-        update()
     }
 }
 
@@ -74,7 +79,7 @@ function rankUpgrade(reset=false) {
         coinGain = new Decimal(1)
         coinBest = new Decimal(0)
         inflation = new Decimal(0)
-        tickspeed = new Decimal(1)
+        tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
         tickspeedBought = new Decimal(0)
         if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
         else cost = Decimal.pow(2, tickspeedBought).times(10)
@@ -104,14 +109,13 @@ function rankUpgrade(reset=false) {
     
         changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(rankCost)+" Coins")
         changeElement("rankEffect", rankEffect)
-        update()
         }
     } else {
         coin = new Decimal(0)
         coinGain = new Decimal(1)
         coinBest = new Decimal(0)
         inflation = new Decimal(0)
-        tickspeed = new Decimal(1)
+        tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
         tickspeedBought = new Decimal(0)
         if (tickspeedBought.gte(14)) cost = Decimal.pow(8, tickspeedBought.sub(14).max(0)).times(1e5)
         else cost = Decimal.pow(2, tickspeedBought).times(10)
@@ -132,7 +136,6 @@ function collapse(reset=false) {
             rankEffect = "Nothing"
             changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, rankBought).times(100))+" Coins")
             changeElement("rankEffect", rankEffect)
-            update()
         } else {
             alert("You need Rank 30 to use this button!")
         }
@@ -144,11 +147,10 @@ function collapse(reset=false) {
         changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, rankBought).times(100))+" Coins")
         changeElement("rankEffect", rankEffect)
         rankUpgrade(true)
-        update()
     }
 }
 
-var collapseUpgrades = [null, false, false]
+var collapseUpgrades = [null, false, false, false]
 function collapseUpgrade(id) {
     if (id == 1) {
         if (knowledge.gte(15) && !collapseUpgrades[1]) {
@@ -163,6 +165,13 @@ function collapseUpgrade(id) {
             knowledge = knowledge.sub(600)
             removeClass("collapseUpgrade2", "sale")
             collapseUpgrades[2] = true
+            collapse(true)
+        }
+    } else if (id == 3) {
+        if (knowledge.gte(3e3) && !collapseUpgrades[3]) {
+            knowledge = knowledge.sub(3e3)
+            removeClass("collapseUpgrade3", "sale")
+            collapseUpgrades[3] = true
             collapse(true)
         }
     }
