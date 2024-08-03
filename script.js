@@ -22,6 +22,7 @@ function update() {
     inflation = coinBest.pow(0.5).div(10).times(infMult)
     changeElement("inflation", format(coinBest)+" total coins is translated into a "+format(inflation.times(100))+"% inflation, which is directly boosting your coin production by "+format(inflation.add(1))+"x.")
 
+    if (rankBought.gte(30)) removeClass("collapseDiv", "locked")
     changeElement("knowledge", "You have "+format(knowledge)+" knowledge")
     changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)))+" knowledge")
     if (collapseUpgrades[2]) changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x"+format(knowledge))
@@ -123,8 +124,6 @@ function rankUpdate() {
     if (rankBought.gte(9)) rankEffect = rankEffect+"<br>Rank 9: Automate Tickspeed Upgrade"
     if (rankBought.gte(15)) rankEffect = rankEffect+"<br>Rank 15: Automate Rank Upgrade"
     if (rankBought.gte(30)) rankEffect = rankEffect+"<br>Rank 30: Unlock Economy Collapse"
-
-    if (rankBought.eq(30)) removeClass("collapseDiv", "locked")
     
     changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(rankCost)+" Coins")
     changeElement("rankEffect", rankEffect)
