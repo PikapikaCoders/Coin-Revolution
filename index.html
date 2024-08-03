@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en-US">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Idle Game</title>
+    <link rel="stylesheet" type="text/css" href="style.css" /> 
+    <script src="node_modules/break_eternity.js/dist/break_eternity.js"></script>
+    <script src="utils.js"></script>
+    <script src="script.js"></script>
+</head>
+ 
+<body>
+    <h1 id="coins">You have 0.00 coins.</h1>
+    <p id="inflation">0.00 total coins is translated into a 0.00% inflation, which is directly boosting your coin production by 1.00x.</p>
+
+    <ul class="tabs">
+        <li data-tab-target="#main" class="active tab" style="background-color:#d3d3d3">Main</li>
+        <li data-tab-target="#economy-collapse" class="tab" style="background-color:#e0ff2e">Economy Collapse</li>
+    </ul>
+
+    <div id="main" data-tab-content class="active">
+        <div class="flex">
+            <div class="card">
+                <h2>Tickspeed Upgrade</h2>
+                <p>Multiply tickspeed</p>
+                <p id="tickspeedDesc">Current Effect: x1.00<br>Next Effect: x1.20<br>Cost: 10.00 Coins</p>
+                <button onclick="tickUpgrade()">Buy</button>
+            </div>
+            <div class="card">
+                <h2>Rank Upgrade</h2>
+                <p>Reset your coins and tickspeed but give a boost according to rank</p>
+                <p id="rankDesc">Current Effect: 0.00 ranks<br>Next Effect: Coin production x3<br>Cost: 100.00 Coins</p>
+                <button onclick="rankUpgrade()">Buy</button>
+            </div>
+        </div>
+        <h3>All Rank Effects:</h3>
+        <p id="rankEffect">Nothing</p>
+    </div>
+
+    <div id="economy-collapse" data-tab-content>
+        <p>(Require Rank 30 to unlock this)</p>
+        <div class="locked" id="collapseDiv">
+            <h3 id="knowledge">You have 0.00 knowledge</h3>
+            <button class="prestige" onclick="collapse()" style="background-color:#e0ff2e" id="collapseButton">Collapse the economy to gain +0.00 knowledge</button><hr>
+
+            <p style="font-size:10px">Buying these upgrades perform an economy collapse prestige.</p>
+            <div class="flex">
+                <button class="upgrade sale" id="collapseUpgrade1" onclick="collapseUpgrade(1)"><b>Supersonic Speed</b><br>Tickspeed Upgrade base power +0.5<br><br>15.00 knowledge</button>
+                <button class="upgrade sale" id="collapseUpgrade2" onclick="collapseUpgrade(2)"><b>Information Bank</b><br>Coin is boosted by knowledge<br><br>600.00 knowledge</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        const tabs = document.querySelectorAll(".tab");
+        const tabContents = document.querySelectorAll("[data-tab-content]");
+        tabs.forEach(tab => {
+          tab.addEventListener("click", () => {
+            const target = document.querySelector(tab.dataset.tabTarget);
+            tabContents.forEach(tabContent => {
+              tabContent.classList.remove("active");
+            });
+            target.classList.add("active");
+          });
+        });
+    </script>
+</body>
+ 
+</html>
