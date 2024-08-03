@@ -34,7 +34,7 @@ function automate() {
     if (rankBought.gte(9)) tickUpgrade()
     if (rankBought.gte(15)) rankUpgrade()
 }
-var automateVar = setInterval(automate, 100)
+var automateVar = setInterval(automate, 1)
 
 //Tickspeed Upgrade
 var tickspeedBought = new Decimal(0)
