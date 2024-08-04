@@ -1,18 +1,25 @@
-//Variables
+//Start
 var coin = new Decimal(0)
 var coinGain = new Decimal(1)
 var coinBest = new Decimal(0)
 var inflation = new Decimal(0)
 var tickspeed = new Decimal(1)
+//Collapse
 var knowledge = new Decimal(0)
+var collapseTick = new Decimal(0)
 
 //Update
 function update() {
-    mult = new Decimal(1)
-    if (tickspeed.gte(1000)) mult = mult.times(tickspeed.div(1000))
+    tickMult = new Decimal(1)
+    if (tickspeed.gte(1000)) tickMult = tickMult.times(tickspeed.div(1000))
+    collapseTick = collapseTick.add(tickMult)
+
+    mult = tickMult
     if (rankBought.gte(1)) mult = mult.times(3)
     if (rankBought.gte(5)) mult = mult.times(Decimal.pow(2, rankBought))
-    if (collapseUpgrades[2]) mult = mult.times(knowledge)
+        exp = new Decimal(1)
+        if (enhancerBought.gte(1)) exp = exp.times(1.4)
+        if (collapseUpgrades[2]) mult = mult.times(knowledge.pow(exp))
     coin = coin.add(coinGain.times(inflation.add(1)).times(mult))
     changeElement("coins", "You have "+format(coin)+" coins.")
     if (coin.gt(coinBest)) coinBest = coin
@@ -22,27 +29,20 @@ function update() {
     inflation = coinBest.pow(0.5).div(10).times(infMult)
     changeElement("inflation", format(coinBest)+" total coins is translated into a "+format(inflation.times(100))+"% inflation, which is directly boosting your coin production by "+format(inflation.add(1))+"x.")
 
-    if (rankBought.gte(30) || knowledge.gte(0)) removeClass("collapseDiv", "locked")
+    if (rankBought.gte(30) || knowledge.gt(1)) removeClass("collapseDiv", "locked")
+    knwMult = new Decimal(1)
+    if (collapseUpgrades[5]) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)))
+    if (enhancerBought.gte(3)) knwMult = knwMult.times(1.8)
     changeElement("knowledge", "You have "+format(knowledge)+" knowledge")
-    changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)))+" knowledge")
-    if (collapseUpgrades[1]) {
-        removeClass("collapseUpgrade1", "sale")
-    }
-    if (collapseUpgrades[2]) {
-        removeClass("collapseUpgrade2", "sale")
-        changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x"+format(knowledge))
-    }
-    if (collapseUpgrades[3]) {
-        removeClass("collapseUpgrade3", "sale")
-        changeElement("collapseUpgrade3", "<b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>Currently: "+format(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))))+" free upgrades")
-    }
+    changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult))+" knowledge")
+    updateCollapse()
 }
 var updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
 
 //Automation (After Update)
 function automate() {
-    if (rankBought.gte(9)) tickUpgrade()
-    if (rankBought.gte(15)) rankUpgrade()
+    if (rankBought.gte(9) || collapseUpgrades[4]) tickUpgrade()
+    if (rankBought.gte(15) || collapseUpgrades[4]) rankUpgrade()
 }
 var automateVar = setInterval(automate, 1)
 
@@ -56,7 +56,9 @@ var getTickspeedBase = function() {
 }
 var getFreeTickspeed = function() {
     free = new Decimal(0)
-    if (collapseUpgrades[3]) free = free.add(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))))
+    mult = new Decimal(1)
+    if (enhancerBought.gte(2)) mult = mult.times(1.5)
+    if (collapseUpgrades[3]) free = free.add(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))).times(mult))
     return free
 }
 function tickUpgrade() {
@@ -138,13 +140,17 @@ function rankUpdate() {
     changeElement("rankEffect", rankEffect)
 }
 
+//Collapse
 function collapse(reset=false) {
     if (!reset) {
         if (rankBought.gte(30)) {
-            knowledge = knowledge.add(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)))
+            knwMult = new Decimal(1)
+            if (collapseUpgrades[5]) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)))
+            knowledge = knowledge.add(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult))
             rankUpgrade(true)
             rankBought = new Decimal(0)
             rankCost = new Decimal(100)
+            collapseTick = new Decimal(0)
             nextEffect = "Coin production x3"
             rankEffect = "Nothing"
             changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, rankBought).times(100))+" Coins")
@@ -155,6 +161,7 @@ function collapse(reset=false) {
     } else { 
         rankBought = new Decimal(0)
         rankCost = new Decimal(100)
+        collapseTick = new Decimal(0)
         nextEffect = "Coin production x3"
         rankEffect = "Nothing"
         changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, rankBought).times(100))+" Coins")
@@ -163,7 +170,8 @@ function collapse(reset=false) {
     }
 }
 
-var collapseUpgrades = [null, false, false, false]
+//Collapse Upgrade
+var collapseUpgrades = [null, false, false, false, false, false]
 function collapseUpgrade(id) {
     if (id == 1) {
         if (knowledge.gte(15) && !collapseUpgrades[1]) {
@@ -184,5 +192,69 @@ function collapseUpgrade(id) {
             collapseUpgrades[3] = true
             collapse(true)
         }
+    } else if (id == 4) {
+        if (knowledge.gte(1e5) && !collapseUpgrades[4]) {
+            knowledge = knowledge.sub(1e5)
+            collapseUpgrades[4] = true
+            collapse(true)
+        }
+    } else if (id == 5) {
+        if (knowledge.gte(3e5) && !collapseUpgrades[5]) {
+            knowledge = knowledge.sub(3e5)
+            collapseUpgrades[5] = true
+            collapse(true)
+        }
     }
+}
+function updateCollapse() {
+    if (collapseUpgrades[1]) {
+        removeClass("collapseUpgrade1", "sale")
+    }
+    if (collapseUpgrades[2]) {
+        removeClass("collapseUpgrade2", "sale")
+        exp = new Decimal(1)
+        if (enhancerBought.gte(1)) exp = exp.times(1.4)
+        changeElement("collapseUpgrade2", "<b>Information Bank</b><br>Coin is boosted by knowledge<br><br>Currently: x"+format(knowledge.pow(exp)))
+    }
+    if (collapseUpgrades[3]) {
+        removeClass("collapseUpgrade3", "sale")
+        mult = new Decimal(1)
+        if (enhancerBought.gte(2)) mult = mult.times(1.5)
+        changeElement("collapseUpgrade3", "<b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>Currently: "+format(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))).times(mult))+" free upgrades")
+    }
+    if (collapseUpgrades[4]) {
+        removeClass("collapseUpgrade4", "sale")
+        changeElement("collapseUpgrade4", "<b>Starting Resources</b><br>Unlock permanent Tickspeed and Rank Auto-Upgrade on collapse")
+    }
+    if (collapseUpgrades[5]) {
+        removeClass("collapseUpgrade5", "sale")
+        mult = new Decimal(1)
+        if (enhancerBought.gte(3)) mult = mult.times(1.8)
+        changeElement("collapseUpgrade5", "<b>Time Savings</b><br>You gain more knowledge based on tick passed<br><br>Currently: x"+format(Decimal.log10(collapseTick.add(10)).times(mult)))
+    }
+}
+
+//Enhancers
+var enhancerBought = new Decimal(0)
+function enhancer(update=false) {
+    if (!update && enhancerBought.lt(3)) {
+        collapse(true)
+        if (knowledge.gte(Decimal.pow(10, enhancerBought.min(2).times(2)).times(1e8))) {
+            knowledge = knowledge.sub(Decimal.pow(10, enhancerBought.min(3).times(2)).times(1e8))
+            enhancerBought = enhancerBought.add(1)
+        }
+    }
+
+    if (enhancerBought.eq(0)) nextEffect = "Information Bank power ^1.4"
+    if (enhancerBought.eq(1)) nextEffect = "Quick Learning power x1.5"
+    if (enhancerBought.eq(2)) nextEffect = "Time Savings power x1.8"
+    else nextEffect = "Maxed"
+
+    if (enhancerBought.gte(0)) enhancerEffect = "Nothing"
+    if (enhancerBought.gte(1)) enhancerEffect = "1 Enhancer: Information Bank power ^1.4"
+    if (enhancerBought.gte(2)) enhancerEffect = enhancerEffect+"<br>2 Enhancers: Quick Learning power x1.5"
+    if (enhancerBought.gte(3)) enhancerEffect = enhancerEffect+"<br>3 Enhancers: Time Savings power x1.8"
+
+    changeElement("enhancerDesc", "Current Effect: "+format(enhancerBought)+" enhancers<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, enhancerBought.min(2).times(2)).times(1e8))+" Coins")
+    changeElement("enhancerEffect", enhancerEffect)
 }

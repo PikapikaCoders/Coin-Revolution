@@ -5,9 +5,11 @@ function saveVariablesToStorage() {
     localStorage.setItem("inflation", inflation)
     localStorage.setItem("tickspeed", tickspeed)
     localStorage.setItem("knowledge", knowledge)
+    localStorage.setItem("collapseTick", collapseTick)
     localStorage.setItem("tickspeedBought", tickspeedBought)
     localStorage.setItem("rankBought", rankBought)
     localStorage.setItem("rankCost", rankCost)
+    localStorage.setItem("enhancerBought", enhancerBought)
     localStorage.setItem("collapseUpgrades", JSON.stringify(collapseUpgrades))
 }
 setInterval(saveVariablesToStorage, 1000)
@@ -31,6 +33,9 @@ function loadVariables() {
     if (localStorage.getItem("knowledge") !== null) {
         knowledge = new Decimal(localStorage.getItem("knowledge"))
     }
+    if (localStorage.getItem("collapseTick") !== null) {
+        collapseTick = new Decimal(localStorage.getItem("collapseTick"))
+    }
     if (localStorage.getItem("tickspeedBought") !== null) {
         tickspeedBought = new Decimal(localStorage.getItem("tickspeedBought"))
     }
@@ -39,6 +44,9 @@ function loadVariables() {
     }
     if (localStorage.getItem("rankCost") !== null) {
         rankCost = new Decimal(localStorage.getItem("rankCost"))
+    }
+    if (localStorage.getItem("enhancerBought") !== null) {
+        enhancerBought = new Decimal(localStorage.getItem("enhancerBought"))
     }
     if (localStorage.getItem("collapseUpgrades") !== null) {
         collapseUpgrades = JSON.parse(localStorage.getItem("collapseUpgrades"))
@@ -49,6 +57,7 @@ function loadVariables() {
         else cost = Decimal.pow(2, tickspeedBought).times(10)
         changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
         rankUpdate()
+        enhancer(true)
     }, 100);
   
     clearInterval(updateVar)
