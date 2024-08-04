@@ -176,7 +176,6 @@ function collapseUpgrade(id) {
     if (id == 1) {
         if (knowledge.gte(15) && !collapseUpgrades[1]) {
             knowledge = knowledge.sub(15)
-            changeElement("collapseUpgrade1", "<b>Supersonic Speed</b><br>Tickspeed Upgrade base power +0.5")
             collapseUpgrades[1] = true
             collapse(true)
         }
@@ -209,6 +208,7 @@ function collapseUpgrade(id) {
 function updateCollapse() {
     if (collapseUpgrades[1]) {
         removeClass("collapseUpgrade1", "sale")
+        changeElement("collapseUpgrade1", "<b>Supersonic Speed</b><br>Tickspeed Upgrade base power +0.5")
     }
     if (collapseUpgrades[2]) {
         removeClass("collapseUpgrade2", "sale")
@@ -246,8 +246,8 @@ function enhancer(update=false) {
     }
 
     if (enhancerBought.eq(0)) nextEffect = "Information Bank power ^1.4"
-    if (enhancerBought.eq(1)) nextEffect = "Quick Learning power x1.5"
-    if (enhancerBought.eq(2)) nextEffect = "Time Savings power x1.8"
+    else if (enhancerBought.eq(1)) nextEffect = "Quick Learning power x1.5"
+    else if (enhancerBought.eq(2)) nextEffect = "Time Savings power x1.8"
     else nextEffect = "Maxed"
 
     if (enhancerBought.gte(0)) enhancerEffect = "Nothing"
