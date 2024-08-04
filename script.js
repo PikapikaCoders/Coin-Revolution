@@ -31,8 +31,13 @@ function update() {
 
     if (rankBought.gte(30) || knowledge.gt(1)) removeClass("collapseDiv", "locked")
     knwMult = new Decimal(1)
-    if (collapseUpgrades[5]) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)))
-    if (enhancerBought.gte(3)) knwMult = knwMult.times(1.8)
+        mult = new Decimal(1)
+        exp = new Decimal(1)
+        if (enhancerBought.gte(3)) {
+            mult = mult.times(2)
+            exp = exp.times(1.2)
+        }
+        if (collapseUpgrades[5]) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp))
     changeElement("knowledge", "You have "+format(knowledge)+" knowledge")
     changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult))+" knowledge")
     updateCollapse()
@@ -145,7 +150,13 @@ function collapse(reset=false) {
     if (!reset) {
         if (rankBought.gte(30)) {
             knwMult = new Decimal(1)
-            if (collapseUpgrades[5]) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)))
+            mult = new Decimal(1)
+            exp = new Decimal(1)
+                if (enhancerBought.gte(3)) {
+                    mult = mult.times(2)
+                    exp = exp.times(1.2)
+                }
+                if (collapseUpgrades[5]) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp))
             knowledge = knowledge.add(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult))
             rankUpgrade(true)
             rankBought = new Decimal(0)
@@ -229,8 +240,12 @@ function updateCollapse() {
     if (collapseUpgrades[5]) {
         removeClass("collapseUpgrade5", "sale")
         mult = new Decimal(1)
-        if (enhancerBought.gte(3)) mult = mult.times(1.8)
-        changeElement("collapseUpgrade5", "<b>Time Savings</b><br>You gain more knowledge based on tick passed<br><br>Currently: x"+format(Decimal.log10(collapseTick.add(10)).times(mult)))
+        exp = new Decimal(1)
+        if (enhancerBought.gte(3)) {
+            mult = mult.times(2)
+            exp = exp.times(1.2)
+        }
+        changeElement("collapseUpgrade5", "<b>Time Savings</b><br>You gain more knowledge based on tick passed<br><br>Currently: x"+format(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp)))
     }
 }
 
@@ -247,13 +262,13 @@ function enhancer(update=false) {
 
     if (enhancerBought.eq(0)) nextEffect = "Information Bank power ^1.4"
     else if (enhancerBought.eq(1)) nextEffect = "Quick Learning power x1.5"
-    else if (enhancerBought.eq(2)) nextEffect = "Time Savings power x1.8"
+    else if (enhancerBought.eq(2)) nextEffect = "Time Savings power x2 and ^1.2"
     else nextEffect = "Maxed"
 
     if (enhancerBought.gte(0)) enhancerEffect = "Nothing"
     if (enhancerBought.gte(1)) enhancerEffect = "1 Enhancer: Information Bank power ^1.4"
     if (enhancerBought.gte(2)) enhancerEffect = enhancerEffect+"<br>2 Enhancers: Quick Learning power x1.5"
-    if (enhancerBought.gte(3)) enhancerEffect = enhancerEffect+"<br>3 Enhancers: Time Savings power x1.8"
+    if (enhancerBought.gte(3)) enhancerEffect = enhancerEffect+"<br>3 Enhancers: Time Savings power x2 and ^1.2"
 
     changeElement("enhancerDesc", "Current Effect: "+format(enhancerBought)+" enhancers<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, enhancerBought.min(2).times(2)).times(1e8))+" Coins")
     changeElement("enhancerEffect", enhancerEffect)
