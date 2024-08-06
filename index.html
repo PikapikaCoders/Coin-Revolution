@@ -13,13 +13,14 @@
 </head>
  
 <body>
-    <p style="margin:0px; font-size: 10px">(Progress is auto-saved)</p>
+    <p style="margin:0px; font-size: 15px"><span style="color:red">NOTE: Please use horizontal mode</span> (Progress is auto-saved)</p>
     <h1 id="coins">You have 0.00 coins.</h1>
     <p id="inflation">0.00 total coins is translated into a 0.00% inflation, which is directly boosting your coin production by 1.00x.</p>
 
     <ul class="tabs">
         <li data-tab-target="#main" class="active tab" style="background-color:#d3d3d3">Main</li>
         <li data-tab-target="#economy-collapse" class="tab" style="background-color:#e0ff2e">Economy Collapse</li>
+        <li data-tab-target="#cash" class="tab locked" id="cashTab" style="background-color:#8bbd5c">Cash</li>
         <li data-tab-target="#save" class="tab" style="background-color:#888888">Save</li>
     </ul>
 
@@ -76,6 +77,20 @@
         </div>
     </div>
 
+    <div id="cash" data-tab-content>
+        <p style="font-size:10px">(You only gain cash when knowledge is higher than 1.00e30)</p>
+        <h3 id="cashDesc" style="margin:10px">You have 0.00 cash</h3>
+        <p id="cashBoost" style="margin:10px">Due to currency exchange, coin production is boosted by x1.00.</p>
+        <div class="flex">
+            <div class="card">
+                <h2>Cash Inflation</h2>
+                <p>Multiply cash production</p>
+                <p id="cashInflationDesc">Current Effect: x1.00<br>Next Effect: x3.00<br>Require: 10.00 Cash</p>
+                <button onclick="cashInflation()">Buy</button>
+            </div>
+        </div> 
+    </div>
+
     <div id="save" data-tab-content>
         <h3>Press the button below to DELETE YOUR SAVE FILE. (Reset literally EVERYTHING)</h3>
         <button class="prestige" onclick="deleteSaveFile()" style="font-size:20px">Delete Save File</button>
@@ -87,6 +102,7 @@
         tabs.forEach(tab => {
           tab.addEventListener("click", () => {
             const target = document.querySelector(tab.dataset.tabTarget);
+            console.log(tab.dataset.tabTarget)
             tabContents.forEach(tabContent => {
               tabContent.classList.remove("active");
             });

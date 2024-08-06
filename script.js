@@ -7,6 +7,8 @@ var tickspeed = new Decimal(1)
 //Collapse
 var knowledge = new Decimal(0)
 var collapseTick = new Decimal(0)
+//Cash
+var cash = new Decimal(0)
 
 //Update
 function update() {
@@ -16,7 +18,7 @@ function update() {
 
     var mult = tickMult
     //Rank 1
-    if (rankBought.add(getFreeRank()).gte(1)) mult = mult.times(3)
+    if (rankBought.add(getFreeRank()).gte(1)) mult = mult.times(4)
     //Rank 5
     var power = new Decimal(2)
     if (collapseUpgrades[6]) power = power.times(1.25)
@@ -27,6 +29,8 @@ function update() {
     if (collapseUpgrades[2]) mult = mult.times(knowledge.add(1).pow(exp))
     //CU 7
     if (collapseUpgrades[7]) mult = mult.times(knowledge.pow(0.1).times(3).add(1))
+    //Cash
+    if (cash.gte(1)) mult = mult.times(cash.pow(3))
     coin = coin.add(coinGain.times(inflation.add(1)).times(mult))
     changeElement("coins", "You have "+format(coin)+" coins.")
     if (coin.gt(coinBest)) coinBest = coin
@@ -58,6 +62,16 @@ function update() {
     changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult))+" knowledge")
     if (enhancerBought.gte(5)) removeClass("chargedCollapseDiv", "locked")
     updateCollapse()
+
+    if (knowledge.gt(1e30) || cash.gt(0) || cashInflationBought.gte(1)) removeClass("cashTab", "locked")
+    if (knowledge.gt(1e30)) {
+        var gain = Decimal.pow(3, cashInflationBought)
+        //Enhancer 6
+        if (enhancerBought.gte(6)) gain = gain.times(knowledge.pow(0.1).times(3).pow(0.5).add(1))
+        cash = cash.add(gain.div(1000))
+    }
+    changeElement("cashDesc", "You have "+format(cash)+" cash")
+    changeElement("cashBoost", "Due to currency exchange, coin production is boosted by x"+format(cash.pow(4))+".")
 }
 var updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
 
@@ -349,8 +363,9 @@ var enhancerBought = new Decimal(0)
 function enhancer(update=false) {
     var cost = Decimal.pow(10, enhancerBought.times(2)).times(1e8)
     if (enhancerBought.eq(3)) cost = new Decimal(1e15)
-    if (enhancerBought.gte(4)) cost = new Decimal(1e18)
-    if (!update && enhancerBought.lt(5)) {
+    if (enhancerBought.eq(4)) cost = new Decimal(1e18)
+    if (enhancerBought.gte(5)) cost = new Decimal(3e37)
+    if (!update && enhancerBought.lt(6)) {
         collapse(true)
         if (knowledge.gte(cost)) {
             knowledge = knowledge.sub(cost)
@@ -363,6 +378,7 @@ function enhancer(update=false) {
     else if (enhancerBought.eq(2)) nextEffect = "Time Savings power x2 and ^1.2"
     else if (enhancerBought.eq(3)) nextEffect = "Supersonic Speed power +0.05"
     else if (enhancerBought.eq(4)) nextEffect = "Unlock Charged Collapse Upgrades"
+    else if (enhancerBought.eq(5)) nextEffect = "Information Tower also boosts Cash with worse effect"
     else nextEffect = "Maxed"
 
     if (enhancerBought.gte(0)) enhancerEffect = "Nothing"
@@ -371,7 +387,19 @@ function enhancer(update=false) {
     if (enhancerBought.gte(3)) enhancerEffect = enhancerEffect+"<br>3 Enhancers: Time Savings power x2 and ^1.2"
     if (enhancerBought.gte(4)) enhancerEffect = enhancerEffect+"<br>4 Enhancers: Supersonic Speed power +0.05"
     if (enhancerBought.gte(5)) enhancerEffect = enhancerEffect+"<br>5 Enhancers: Unlock Charged Collapse Upgrades"
+    if (enhancerBought.gte(6)) enhancerEffect = enhancerEffect+"<br>6 Enhancers: Information Tower also boosts Cash with worse effect"
 
     changeElement("enhancerDesc", "Current Effect: "+format(enhancerBought, 0)+" enhancers<br>Next Effect: "+nextEffect+"<br>Cost: "+format(cost)+" Coins")
     changeElement("enhancerEffect", enhancerEffect)
+}
+
+//Cash
+var cashInflationBought = new Decimal(0)
+function cashInflation() {
+    var cost = Decimal.pow(10, cashInflationBought).times(10)
+    if (cashInflationBought.gte(9)) cost = Decimal.pow(10, cashInflationBought.sub(10).max(1)).times(1e10)
+    if (knowledge.gte(cost)) {
+        cashInflationBought = cashInflationBought.add(1)
+        changeElement("cashInflationDesc", "Current Effect: x"+format(Decimal.pow(3, cashInflationBought))+"<br>Next Effect: x"+format(Decimal.pow(3, cashInflationBought.add(1)))+"<br>Require: "+format(cost)+" Cash")
+    }
 }

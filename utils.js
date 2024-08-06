@@ -22,7 +22,8 @@ function toScientific(decimal, precision=2) {
     if (isNaN(Decimal.log10(decimal))) mag = new Decimal(0)
     mult = decimal.div(Decimal.pow(10, mag)).toStringWithDecimalPlaces(precision)
     if (new Decimal(mag).gte(1e3)) {
-        mag = format(new Decimal(mag))
+        mag = format(new Decimal(mag), 0, 3)
+        mult = ""
     }
     return mult+"e"+mag
 }
