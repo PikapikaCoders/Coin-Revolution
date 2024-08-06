@@ -33,8 +33,8 @@
             </div>
             <div class="card">
                 <h2>Rank Upgrade</h2>
-                <p>Reset your coins and tickspeed but give a boost according to rank</p>
-                <p id="rankDesc">Current Effect: 0.00 ranks<br>Next Effect: Coin production x3<br>Cost: 100.00 Coins</p>
+                <p id="rankReset">Reset your coins and tickspeed but give a boost according to rank</p>
+                <p id="rankDesc">Current Effect: 0 ranks<br>Next Effect: Coin production x3<br>Cost: 100.00 Coins</p>
                 <button onclick="rankUpgrade()">Buy</button>
             </div>
         </div>
@@ -56,11 +56,18 @@
                 <button class="upgrade sale" id="collapseUpgrade4" onclick="collapseUpgrade(4)"><b>Starting Resources</b><br>Unlock permanent Tickspeed and Rank Auto-Upgrade<br><br>1.00e5 knowledge</button>
                 <button class="upgrade sale" id="collapseUpgrade5" onclick="collapseUpgrade(5)"><b>Time Savings</b><br>You gain more knowledge based on tick passed<br><br>3.00e5 knowledge</button>
             </div>
+            <div class="flex locked" id="chargedCollapseDiv">
+                <button class="upgrade sale" id="collapseUpgrade6" onclick="collapseUpgrade(6)"><b>Speed of Light</b><br>Rank 5 effect power x1.5<br><br>1.00e17 knowledge</button>
+                <button class="upgrade sale" id="collapseUpgrade7" onclick="collapseUpgrade(7)"><b>Information Tower</b><br>Coin and Inflation is boosted by knowledge<br><br>2.00e21 knowledge</button>
+                <button class="upgrade sale" id="collapseUpgrade8" onclick="collapseUpgrade(8)"><b>Learning Network</b><br>Get free Rank Upgrades depending on knowledge<br><br>2.00e25 knowledge</button>
+                <button class="upgrade sale" id="collapseUpgrade9" onclick="collapseUpgrade(9)"><b>Voidless</b><br>Rank Upgrade doesn't reset anything<br><br>1.00e27 knowledge</button>
+                <button class="upgrade sale" id="collapseUpgrade10" onclick="collapseUpgrade(10)"><b>Rainy Day</b><br>You gain more knowledge based on real-time passed this online session<br><br>1.00e28 knowledge</button>
+            </div>
             <div class="flex">
                 <div class="card">
                     <h2>Upgrade Enhancers</h2>
                     <p>Make the collapse upgrades better</p>
-                    <p id="enhancerDesc">Current Effect: 0.00 enhancers<br>Next Effect: Information Bank power ^1.2<br>Cost: 1.00e8 knowledge</p>
+                    <p id="enhancerDesc">Current Effect: 0 enhancers<br>Next Effect: Information Bank power ^1.2<br>Cost: 1.00e8 knowledge</p>
                     <button onclick="enhancer()">Buy</button>
                 </div>
             </div>
