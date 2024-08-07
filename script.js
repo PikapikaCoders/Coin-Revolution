@@ -1,6 +1,5 @@
 //Start
 var coin = new Decimal(0)
-var coinGain = new Decimal(1)
 var coinBest = new Decimal(0)
 var inflation = new Decimal(0)
 var tickspeed = new Decimal(1)
@@ -18,7 +17,7 @@ function update() {
 
     var mult = tickMult
     //Rank 1
-    if (rankBought.add(getFreeRank()).gte(1)) mult = mult.times(4)
+    if (rankBought.add(getFreeRank()).gte(1)) mult = mult.times(3)
     //Rank 5
     var power = new Decimal(2)
     if (collapseUpgrades[6]) power = power.times(1.25)
@@ -31,8 +30,9 @@ function update() {
     if (collapseUpgrades[7]) mult = mult.times(knowledge.pow(0.1).times(3).add(1))
     //Cash
     if (cash.gte(1)) mult = mult.times(cash.pow(3))
-    coin = coin.add(coinGain.times(inflation.add(1)).times(mult))
-    changeElement("coins", "You have "+format(coin)+" coins.")
+    coin = coin.add(new Decimal(1).times(inflation.add(1)).times(mult))
+    if (cashChallangeActive) changeElement("coins", "You have "+format(coin)+" coins <span style=\"color:red\">inside of Cash Bank</span>.")
+    else changeElement("coins", "You have "+format(coin)+" coins.")
     if (coin.gt(coinBest)) coinBest = coin
 
     var infMult = new Decimal(1)
@@ -55,11 +55,15 @@ function update() {
         mult = mult.times(2)
         exp = exp.times(1.2)
     }
-    if (collapseUpgrades[5]) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp))
+    if (collapseUpgrades[5] && !isNaN(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp))) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp))
     //CU 10
-    if (collapseUpgrades[10]) knwMult = knwMult.times(new Decimal(getCollapseTime()).pow(0.6))
+    if (collapseUpgrades[10]) knwMult = knwMult.times(new Decimal(getCollapseTime()).add(1).pow(0.6))
+    //Cash Bank
+    if (cashChallangeCompleted) knwMult = knwMult.times(cash.pow(0.5))
     changeElement("knowledge", "You have "+format(knowledge)+" knowledge")
-    changeElement("collapseButton", "Collapse the economy to gain +"+format(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult))+" knowledge")
+    var knwGain = Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult)
+    if (cashChallangeActive) knwGain = knwGain.pow(0.8)
+    changeElement("collapseButton", "Collapse the economy to gain +"+format(knwGain)+" knowledge")
     if (enhancerBought.gte(5)) removeClass("chargedCollapseDiv", "locked")
     updateCollapse()
 
@@ -71,7 +75,8 @@ function update() {
         cash = cash.add(gain.div(1000))
     }
     changeElement("cashDesc", "You have "+format(cash)+" cash")
-    changeElement("cashBoost", "Due to currency exchange, coin production is boosted by x"+format(cash.pow(4))+".")
+    changeElement("cashBoost", "Due to currency exchange, coin production is boosted by x"+format(cash.pow(3))+".")
+    if (cashChallangeCompleted) changeElement("cashChallangeCompletion", "CHALLANGE COMPLETED")
 }
 var updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
 
@@ -133,7 +138,6 @@ function rankUpgrade(reset=false) {
             rankUpdate() 
             if (!collapseUpgrades[9]) {
                 coin = new Decimal(0)
-                coinGain = new Decimal(1)
                 coinBest = new Decimal(0)
                 inflation = new Decimal(0)
                 tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
@@ -148,7 +152,6 @@ function rankUpgrade(reset=false) {
         }
     } else {
         coin = new Decimal(0)
-        coinGain = new Decimal(1)
         coinBest = new Decimal(0)
         inflation = new Decimal(0)
         tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
@@ -209,10 +212,14 @@ function collapse(reset=false) {
                 mult = mult.times(2)
                 exp = exp.times(1.2)
             }
-            if (collapseUpgrades[5]) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp))
+            if (collapseUpgrades[5] && !isNaN(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp))) knwMult = knwMult.times(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp))
             //CU 10
-            if (collapseUpgrades[10]) knwMult = knwMult.times(new Decimal(getCollapseTime()).pow(0.6))
-            knowledge = knowledge.add(Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult))
+            if (collapseUpgrades[10]) knwMult = knwMult.times(new Decimal(getCollapseTime()).add(1).pow(0.6))
+            //Cash Bank
+            if (cashChallangeCompleted) knwMult = knwMult.times(cash.pow(0.5))
+            var knwGain = Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult)
+            if (cashChallangeActive) knwGain = knwGain.pow(0.8)
+            knowledge = knowledge.add(knwGain)
             rankUpgrade(true)
             rankBought = getFreeRank()
             rankCost = new Decimal(100)
@@ -226,6 +233,7 @@ function collapse(reset=false) {
             alert("You need Rank 30 to use this button!")
         }
     } else { 
+        rankUpgrade(true)
         rankBought = getFreeRank()
         rankCost = new Decimal(100)
         collapseTick = new Decimal(0)
@@ -234,7 +242,6 @@ function collapse(reset=false) {
         rankEffect = "Nothing"
         changeElement("rankDesc", "Current Effect: "+format(rankBought, 0)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, rankBought).times(100))+" Coins")
         changeElement("rankEffect", rankEffect)
-        rankUpgrade(true)
     }
 }
 
@@ -320,7 +327,7 @@ function updateCollapse() {
         removeClass("collapseUpgrade3", "sale")
         var mult = new Decimal(1)
         if (enhancerBought.gte(2)) mult = mult.times(1.5)
-        changeElement("collapseUpgrade3", "<b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>Currently: "+format(Decimal.floor(Decimal.ln(knowledge).div(Decimal.ln(2))).times(mult).max(1))+" free upgrades")
+        changeElement("collapseUpgrade3", "<b>Quick Learning</b><br>Get free Tickspeed Upgrades depending on knowledge<br><br>Currently: "+format(Decimal.floor(Decimal.ln(knowledge.add(2)).div(Decimal.ln(2))).times(mult).max(1))+" free upgrades")
     }
     if (collapseUpgrades[4]) {
         removeClass("collapseUpgrade4", "sale")
@@ -334,7 +341,8 @@ function updateCollapse() {
             mult = mult.times(2)
             exp = exp.times(1.2)
         }
-        changeElement("collapseUpgrade5", "<b>Time Savings</b><br>You gain more knowledge based on tick passed<br><br>Currently: x"+format(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp)))
+        if (!isNaN(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp))) changeElement("collapseUpgrade5", "<b>Time Savings</b><br>You gain more knowledge based on tick passed<br><br>Currently: x"+format(Decimal.log10(collapseTick.add(10)).times(mult).pow(exp)))
+        else changeElement("collapseUpgrade5", "<b>Time Savings</b><br>You gain more knowledge based on tick passed<br><br>Currently: x1.00")
     }
     if (collapseUpgrades[6]) {
         removeClass("collapseUpgrade6", "sale")
@@ -354,7 +362,7 @@ function updateCollapse() {
     }
     if (collapseUpgrades[10]) {
         removeClass("collapseUpgrade10", "sale")
-        changeElement("collapseUpgrade10", "<b>Rainy Day</b><br>You gain more knowledge based on real-time passed this online session<br><br>Currently: x"+format(new Decimal(getCollapseTime()).pow(0.6)))
+        changeElement("collapseUpgrade10", "<b>Rainy Day</b><br>You gain more knowledge based on real-time passed this online session<br><br>Currently: x"+format(new Decimal(getCollapseTime()).add(1).pow(0.6)))
     }
 }
 
@@ -402,4 +410,21 @@ function cashInflation() {
         cashInflationBought = cashInflationBought.add(1)
         changeElement("cashInflationDesc", "Current Effect: x"+format(Decimal.pow(3, cashInflationBought))+"<br>Next Effect: x"+format(Decimal.pow(3, cashInflationBought.add(1)))+"<br>Require: "+format(cost)+" Cash")
     }
+}
+
+var cashChallangeCompleted = false;
+var cashChallangeActive = false;
+var savedKnowledge = new Decimal(0);
+function cashChallange() {
+    if (!cashChallangeActive) {
+        collapse(true)
+        savedKnowledge = knowledge
+        knowledge = new Decimal(0)
+    } else {
+        knowledge = savedKnowledge
+        collapse(true)
+        if (knowledge.gte(1e25)) cashChallangeCompleted = true;
+        savedKnowledge = new Decimal(0)
+    }
+    cashChallangeActive = !cashChallangeActive
 }

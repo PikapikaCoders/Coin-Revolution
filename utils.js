@@ -13,9 +13,9 @@ function checkClass(id, name) {
 
 function format(decimal, precision=2, scientificPrecision=2) {
     if (decimal.eq(0)) return (0).toFixed(precision)  
-    else if (!decimal.gte(1e3)) return decimal.toStringWithDecimalPlaces(precision)
-    else if (!decimal.gte(new Decimal("eee15"))) return toScientific(decimal, scientificPrecision)
-    else return "[Dev didn't made the formatting this big]"
+    else if (decimal.lt(1e3) && decimal.gt(0)) return decimal.toStringWithDecimalPlaces(precision)
+    else if (decimal.lt(new Decimal("eee15")) || decimal.lt(0)) return toScientific(decimal, scientificPrecision)
+    else return "ERROR"
 }
 function toScientific(decimal, precision=2) {
     mag = Decimal.floor(Decimal.log10(decimal))

@@ -1,6 +1,5 @@
 function saveVariablesToStorage() {
     localStorage.setItem("coin", coin)
-    localStorage.setItem("coinGain", coinGain)
     localStorage.setItem("coinBest", coinBest)
     localStorage.setItem("inflation", inflation)
     localStorage.setItem("tickspeed", tickspeed)
@@ -12,6 +11,9 @@ function saveVariablesToStorage() {
     localStorage.setItem("rankCost", rankCost)
     localStorage.setItem("enhancerBought", enhancerBought)
     localStorage.setItem("cashInflationBought", cashInflationBought)
+    localStorage.setItem("cashChallangeCompleted", cashChallangeCompleted)
+    localStorage.setItem("cashChallangeActive", cashChallangeActive)
+    localStorage.setItem("savedKnowledge", savedKnowledge)
     localStorage.setItem("collapseUpgrades", JSON.stringify(collapseUpgrades))
 }
 setInterval(saveVariablesToStorage, 1000)
@@ -19,9 +21,6 @@ setInterval(saveVariablesToStorage, 1000)
 function loadVariables() {
     if (localStorage.getItem("coin") !== null) {
         coin = new Decimal(localStorage.getItem("coin"))
-    }
-    if (localStorage.getItem("coinGain") !== null) {
-        coinGain = new Decimal(localStorage.getItem("coinGain"))
     }
     if (localStorage.getItem("coinBest") !== null) {
         coinBest = new Decimal(localStorage.getItem("coinBest"))
@@ -55,6 +54,15 @@ function loadVariables() {
     }
     if (localStorage.getItem("cashInflationBought") !== null) {
         cashInflationBought = new Decimal(localStorage.getItem("cashInflationBought"))
+    }
+    if (localStorage.getItem("cashChallangeCompleted") !== null) {
+        cashChallangeCompleted = JSON.parse(localStorage.getItem("cashChallangeCompleted"))
+    }
+    if (localStorage.getItem("cashChallangeActive") !== null) {
+        cashChallangeActive = JSON.parse(localStorage.getItem("cashChallangeActive"))
+    }
+    if (localStorage.getItem("savedKnowledge") !== null) {
+        savedKnowledge = new Decimal(localStorage.getItem("savedKnowledge"))
     }
     if (localStorage.getItem("collapseUpgrades") !== null) {
         collapseUpgrades = JSON.parse(localStorage.getItem("collapseUpgrades"))

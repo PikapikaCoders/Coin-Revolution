@@ -10,6 +10,8 @@ button {
 .card {
     margin: 1rem;
     padding: 1.5rem;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
     text-align: left;
     color: inherit;
     text-decoration: none;
@@ -17,7 +19,7 @@ button {
     border-radius: 10px;
     transition: color 0.15s ease, border-color 0.15s ease;
     width: 280px;
-    height: 240px;
+    height: 255px;
 }
 .card:hover,
 .card:focus,
@@ -108,4 +110,21 @@ button.upgrade {
       top: 100%;
       left: 0;
     }
+}
+
+.rotate{
+    animation: spinner 5s linear infinite; 
+}
+@keyframes spinner {
+    to { transform: rotate(360deg); }
+}
+
+.circle {
+    height: 75px;
+    width: 75px;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 50%;
+    font-size: 53px;
+    display: inline-block;
 }
