@@ -27,3 +27,10 @@ function toScientific(decimal, precision=2) {
     }
     return mult+"e"+mag
 }
+
+/**
+ * Does a log using the ln(num)/ln(base) method. Never returns NaN.
+ */
+function lnLog(decimal, base) {
+    return Decimal.ln(decimal).div(Decimal.ln(base))
+}

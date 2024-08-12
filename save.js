@@ -6,6 +6,8 @@ function saveVariablesToStorage() {
     localStorage.setItem("knowledge", knowledge)
     localStorage.setItem("collapseTick", collapseTick)
     localStorage.setItem("cash", cash)
+    localStorage.setItem("machine", machine)
+    localStorage.setItem("machineGain", machineGain)
     localStorage.setItem("tickspeedBought", tickspeedBought)
     localStorage.setItem("rankBought", rankBought)
     localStorage.setItem("rankCost", rankCost)
@@ -39,6 +41,12 @@ function loadVariables() {
     }
     if (localStorage.getItem("cash") !== null) {
         cash = new Decimal(localStorage.getItem("cash"))
+    }
+    if (localStorage.getItem("machine") !== null) {
+        machine = new Decimal(localStorage.getItem("machine"))
+    }
+    if (localStorage.getItem("machineGain") !== null) {
+        machineGain = new Decimal(localStorage.getItem("machineGain"))
     }
     if (localStorage.getItem("tickspeedBought") !== null) {
         tickspeedBought = new Decimal(localStorage.getItem("tickspeedBought"))
@@ -75,9 +83,9 @@ function loadVariables() {
         changeElement("tickspeedDesc", "Current Effect: x"+format(tickspeed)+"<br>Next Effect: x"+format(tickspeed.times(getTickspeedBase()))+"<br>Cost: "+format(cost)+" Coins")
         rankUpdate()
         enhancer(true)
-        cost = Decimal.pow(10, cashInflationBought).times(10)
-        if (cashInflationBought.gte(9)) cost = Decimal.pow(10, cashInflationBought.sub(10).max(1)).times(1e10)
-        changeElement("cashInflationDesc", "Current Effect: x"+format(Decimal.pow(3, cashInflationBought))+"<br>Next Effect: x"+format(Decimal.pow(3, cashInflationBought.add(1)))+"<br>Cost: "+format(cost)+" Cash")
+        var cost = Decimal.pow(10, cashInflationBought)
+        if (cashInflationBought.gte(10)) cost = Decimal.pow(10, cashInflationBought.times(2).sub(19).max(1)).times(1e10)
+        changeElement("cashInflationDesc", "Current Effect: x"+format(Decimal.pow(3, cashInflationBought))+"<br>Next Effect: x"+format(Decimal.pow(3, cashInflationBought.add(1)))+"<br>Require: "+format(cost)+" Cash")
     }, 100);
   
     clearInterval(updateVar)

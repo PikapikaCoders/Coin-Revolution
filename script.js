@@ -8,6 +8,11 @@ var knowledge = new Decimal(0)
 var collapseTick = new Decimal(0)
 //Cash
 var cash = new Decimal(0)
+var machine = new Decimal(0)
+var machineGain = new Decimal(0)
+
+//Unsaved Variables
+var knowledgeGain = new Decimal(0)
 
 //Update
 function update() {
@@ -16,6 +21,7 @@ function update() {
     collapseTick = collapseTick.add(tickMult)
 
     var mult = tickMult
+    var coinExp = new Decimal(1)
     //Rank 1
     if (rankBought.add(getFreeRank()).gte(1)) mult = mult.times(3)
     //Rank 5
@@ -30,7 +36,9 @@ function update() {
     if (collapseUpgrades[7]) mult = mult.times(knowledge.pow(0.1).times(3).add(1))
     //Cash
     if (cash.gte(1)) mult = mult.times(cash.pow(3))
-    coin = coin.add(new Decimal(1).times(inflation.add(1)).times(mult))
+    //Fused Machines
+    coinExp = machine.pow(0.8).div(50).add(1)
+    coin = coin.add(new Decimal(1).times(inflation.add(1)).times(mult).pow(coinExp))
     if (cashChallangeActive) changeElement("coins", "You have "+format(coin)+" coins <span style=\"color:red\">inside of Cash Bank</span>.")
     else changeElement("coins", "You have "+format(coin)+" coins.")
     if (coin.gt(coinBest)) coinBest = coin
@@ -63,6 +71,7 @@ function update() {
     changeElement("knowledge", "You have "+format(knowledge)+" knowledge")
     var knwGain = Decimal.pow(10, Decimal.log10(coinBest.add(10)).div(32)).times(knwMult)
     if (cashChallangeActive) knwGain = knwGain.pow(0.8)
+    knowledgeGain = knwGain
     changeElement("collapseButton", "Collapse the economy to gain +"+format(knwGain)+" knowledge")
     if (enhancerBought.gte(5)) removeClass("chargedCollapseDiv", "locked")
     updateCollapse()
@@ -72,11 +81,22 @@ function update() {
         var gain = Decimal.pow(3, cashInflationBought)
         //Enhancer 6
         if (enhancerBought.gte(6)) gain = gain.times(knowledge.pow(0.1).times(3).pow(0.5).add(1))
-        cash = cash.add(gain.div(1000))
+        cash = cash.add(gain.div(1000).pow(machine.pow(0.8).div(5).add(1)))
     }
     changeElement("cashDesc", "You have "+format(cash)+" cash")
     changeElement("cashBoost", "Due to currency exchange, coin production is boosted by x"+format(cash.pow(3))+".")
     if (cashChallangeCompleted) changeElement("cashChallangeCompletion", "CHALLANGE COMPLETED")
+    if (coin.gte(new Decimal("e1.888e3")) || machine.gte(1)) {
+        removeClass("machineLine", "locked")
+        removeClass("machineDiv", "locked")
+    }
+    changeElement("machine", "You have "+machine+" fused machines")
+    machineGain = Decimal.min(lnLog(coin, 10).div(1.9e3).root(1.05), lnLog(cash.div(3), 10).sub(5).div(5).root(1.18)).floor().sub(machine).max(0)
+    changeElement("machineButton", "Use your currency to build "+format(machineGain, 0)+" fused machines")
+    var coinCost = Decimal.pow(10, machine.add(1).pow(1.05).times(1.9e3))
+    var cashCost = Decimal.pow(10, machine.add(1).pow(1.18).times(5).add(5)).times(3)
+    changeElement("machineCost", "Next fused machine at <b>"+format(coinCost)+" Coin + "+format(cashCost)+" Cash</b>")
+    changeElement("machineEffect", "which are boosting Coin by ^"+format(machine.pow(0.8).div(50).add(1))+" and Cash by ^"+format(machine.pow(0.8).div(5).add(1))+" ")
 }
 var updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
 
@@ -84,6 +104,7 @@ var updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
 function automate() {
     if (rankBought.add(getFreeRank()).gte(9) || collapseUpgrades[4]) tickUpgrade()
     if (rankBought.add(getFreeRank()).gte(15) || collapseUpgrades[4]) rankUpgrade()
+    if (enhancerBought.gte(7)) knowledge = knowledge.add(knowledgeGain.div(10000))
 }
 var automateVar = setInterval(automate, 1)
 
@@ -373,7 +394,8 @@ function enhancer(update=false) {
     if (enhancerBought.eq(3)) cost = new Decimal(1e15)
     if (enhancerBought.eq(4)) cost = new Decimal(1e18)
     if (enhancerBought.gte(5)) cost = new Decimal(3e37)
-    if (!update && enhancerBought.lt(6)) {
+    if (enhancerBought.gte(6)) cost = new Decimal(1e130)
+    if (!update && enhancerBought.lt(7)) {
         collapse(true)
         if (knowledge.gte(cost)) {
             knowledge = knowledge.sub(cost)
@@ -387,6 +409,7 @@ function enhancer(update=false) {
     else if (enhancerBought.eq(3)) nextEffect = "Supersonic Speed power +0.05"
     else if (enhancerBought.eq(4)) nextEffect = "Unlock Charged Collapse Upgrades"
     else if (enhancerBought.eq(5)) nextEffect = "Information Tower also boosts Cash with worse effect"
+    else if (enhancerBought.eq(6)) nextEffect = "Gain 0.01% the amount of knowledge when collapse every tick."
     else nextEffect = "Maxed"
 
     if (enhancerBought.gte(0)) enhancerEffect = "Nothing"
@@ -396,7 +419,13 @@ function enhancer(update=false) {
     if (enhancerBought.gte(4)) enhancerEffect = enhancerEffect+"<br>4 Enhancers: Supersonic Speed power +0.05"
     if (enhancerBought.gte(5)) enhancerEffect = enhancerEffect+"<br>5 Enhancers: Unlock Charged Collapse Upgrades"
     if (enhancerBought.gte(6)) enhancerEffect = enhancerEffect+"<br>6 Enhancers: Information Tower also boosts Cash with worse effect"
+    if (enhancerBought.gte(7)) enhancerEffect = enhancerEffect+"<br>7 Enhancers: Gain 0.01% the amount of knowledge when collapse every tick."
 
+    var cost = Decimal.pow(10, enhancerBought.times(2)).times(1e8)
+    if (enhancerBought.eq(3)) cost = new Decimal(1e15)
+    if (enhancerBought.eq(4)) cost = new Decimal(1e18)
+    if (enhancerBought.gte(5)) cost = new Decimal(3e37)
+        if (enhancerBought.gte(6)) cost = new Decimal(1e130)
     changeElement("enhancerDesc", "Current Effect: "+format(enhancerBought, 0)+" enhancers<br>Next Effect: "+nextEffect+"<br>Cost: "+format(cost)+" Coins")
     changeElement("enhancerEffect", enhancerEffect)
 }
@@ -404,10 +433,12 @@ function enhancer(update=false) {
 //Cash
 var cashInflationBought = new Decimal(0)
 function cashInflation() {
-    var cost = Decimal.pow(10, cashInflationBought).times(10)
-    if (cashInflationBought.gte(9)) cost = Decimal.pow(10, cashInflationBought.sub(10).max(1)).times(1e10)
-    if (knowledge.gte(cost)) {
+    var cost = Decimal.pow(10, cashInflationBought)
+    if (cashInflationBought.gte(10)) cost = Decimal.pow(10, cashInflationBought.times(2).sub(19).max(1)).times(1e10)
+    if (cash.gte(cost)) {
         cashInflationBought = cashInflationBought.add(1)
+        var cost = Decimal.pow(10, cashInflationBought)
+        if (cashInflationBought.gte(10)) cost = Decimal.pow(10, cashInflationBought.times(2).sub(19).max(1)).times(1e10)
         changeElement("cashInflationDesc", "Current Effect: x"+format(Decimal.pow(3, cashInflationBought))+"<br>Next Effect: x"+format(Decimal.pow(3, cashInflationBought.add(1)))+"<br>Require: "+format(cost)+" Cash")
     }
 }
@@ -427,4 +458,16 @@ function cashChallange() {
         savedKnowledge = new Decimal(0)
     }
     cashChallangeActive = !cashChallangeActive
+}
+
+//Fused Machines
+function fusedMachine(reset=false) {
+    if (!reset) {
+        if (machineGain.gte(1)) {
+            machine = machine.add(machineGain)
+            collapse(true)
+        }
+    } else {
+        collapse(true)
+    }
 }
