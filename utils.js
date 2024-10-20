@@ -34,3 +34,7 @@ function toScientific(decimal, precision=2) {
 function lnLog(decimal, base) {
     return Decimal.ln(decimal).div(Decimal.ln(base))
 }
+
+/**
+ * Calculates the compound interest.
+ */

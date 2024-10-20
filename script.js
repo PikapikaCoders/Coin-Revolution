@@ -13,6 +13,7 @@ var machineGain = new Decimal(0)
 
 //Unsaved Variables
 var knowledgeGain = new Decimal(0)
+var machineRevert = false
 
 //Update
 function update() {
@@ -52,7 +53,7 @@ function update() {
     changeElement("inflation", format(coinBest)+" total coins is translated into a "+format(inflation.times(100))+"% inflation, which is directly boosting your coin production by "+format(inflation.add(1))+"x.")
 
     //CU 9
-    if (collapseUpgrades[9]) changeElement("rankReset", "Reset your tickspeed but give a boost according to rank")
+    if (collapseUpgrades[9]) changeElement("rankReset", "Reset <span style=\"color:#009999\">nothing</span> and give a boost according to rank")
     else changeElement("rankReset", "Reset your coins and tickspeed but give a boost according to rank")
     if (rankBought.add(getFreeRank()).gte(30) || knowledge.gt(1)) removeClass("collapseDiv", "locked")
     knwMult = new Decimal(1)
@@ -100,7 +101,7 @@ function update() {
 }
 var updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
 
-//Automation (After Update)
+//Automation
 function automate() {
     if (rankBought.add(getFreeRank()).gte(9) || collapseUpgrades[4]) tickUpgrade()
     if (rankBought.add(getFreeRank()).gte(15) || collapseUpgrades[4]) rankUpgrade()
@@ -426,7 +427,7 @@ function enhancer(update=false) {
     if (enhancerBought.eq(4)) cost = new Decimal(1e18)
     if (enhancerBought.gte(5)) cost = new Decimal(3e37)
         if (enhancerBought.gte(6)) cost = new Decimal(1e130)
-    changeElement("enhancerDesc", "Current Effect: "+format(enhancerBought, 0)+" enhancers<br>Next Effect: "+nextEffect+"<br>Cost: "+format(cost)+" Coins")
+    changeElement("enhancerDesc", "Current Effect: "+format(enhancerBought, 0)+" enhancers<br>Next Effect: "+nextEffect+"<br>Cost: "+format(cost)+" knowledge")
     changeElement("enhancerEffect", enhancerEffect)
 }
 

@@ -128,3 +128,8 @@ button.upgrade {
     font-size: 53px;
     display: inline-block;
 }
+
+.invert {
+    filter: invert(100%);
+    background-color: black;
+}
