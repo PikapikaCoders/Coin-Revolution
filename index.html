@@ -7,6 +7,7 @@
     <title>Coin Revolution</title>
     <link rel="stylesheet" type="text/css" href="style.css" /> 
     <script src="node_modules/break_eternity.js/dist/break_eternity.js"></script>
+    <script src="eternal_notations.js"></script>
     <script src="utils.js"></script>
     <script src="script.js"></script>
     <script src="save.js"></script>
@@ -15,13 +16,14 @@
 <body id="body">
     <p style="margin:0px; font-size: 15px"><span style="color:red">NOTE: Please use horizontal mode</span> (Progress is auto-saved)</p>
     <h1 id="coins">You have 0.00 coins.</h1>
-    <p id="inflation">0.00 total coins is translated into a 0.00% inflation, which is directly boosting your coin production by 1.00x.</p>
+    <p id="inflation">0.00 best coins is translated into a 0.00% inflation, which is directly boosting your coin production by 1.00x.</p>
 
     <ul class="tabs">
         <li data-tab-target="#main" class="active tab" style="background-color:#d3d3d3">Main</li>
         <li data-tab-target="#economy-collapse" class="tab" style="background-color:#e0ff2e">Economy Collapse</li>
         <li data-tab-target="#cash" class="tab locked" id="cashTab" style="background-color:#8bbd5c">Cash</li>
-        <li data-tab-target="#save" class="tab" style="background-color:#888888">Save</li>
+        <li data-tab-target="#investment" class="tab locked" id="investmentTab" style="background-color:#ff9d8c">Investment</li>
+        <li data-tab-target="#save" class="tab" style="background-color:#888888">Save/Changelogs</li>
     </ul>
 
     <div id="main" data-tab-content class="active">
@@ -35,7 +37,7 @@
             <div class="card">
                 <h2>Rank Upgrade</h2>
                 <p id="rankReset">Reset your coins and tickspeed but give a boost according to rank</p>
-                <p id="rankDesc">Current Effect: 0 ranks<br>Next Effect: Coin production x3<br>Cost: 100.00 Coins</p>
+                <p id="rankDesc">Current Effect: 0.00 ranks<br>Next Effect: Coin production x3<br>Cost: 100.00 Coins</p>
                 <button onclick="rankUpgrade()">Buy</button>
             </div>
         </div>
@@ -68,7 +70,7 @@
                 <div class="card">
                     <h2>Upgrade Enhancers</h2>
                     <p>Make the collapse upgrades better</p>
-                    <p id="enhancerDesc">Current Effect: 0 enhancers<br>Next Effect: Information Bank power ^1.2<br>Cost: 1.00e8 knowledge</p>
+                    <p id="enhancerDesc">Current Effect: 0.00 enhancers<br>Next Effect: Information Bank power ^1.2<br>Cost: 1.00e8 knowledge</p>
                     <button onclick="enhancer()">Buy</button>
                 </div>
             </div>
@@ -101,10 +103,19 @@
             </div>
         </div>
 
+        <p style="font-size:10px">Buying these upgrades perform an economy collapse prestige.</p>
+        <div class="flex locked" id="cashUpgradeDiv">
+            <button class="upgrade sale" id="cashUpgrade1" onclick="cashUpgrade(1)"><b>Investment Rates</b><br>Unlock new rank effect at rank 200<br><br>1.00e24 cash</button>
+            <button class="upgrade sale" id="cashUpgrade2" onclick="cashUpgrade(2)"><b>Quicker Flips</b><br>Decrease investment cooldown by x4<br><br>1.00e45 cash</button>
+            <button class="upgrade sale" id="cashUpgrade3" onclick="cashUpgrade(3)"><b>Severe Flips</b><br>Increase growth by x4<br><br>1.00e45 cash</button>
+            <button class="upgrade sale" id="cashUpgrade4" onclick="cashUpgrade(4)"><b>Gambler's Dice</b><br>Cash upgrade 2-3 are 2x stronger and unlock stocks in investment tab<br><br>1.00e85 cash</button>
+            <button class="upgrade sale" id="cashUpgrade5" onclick="cashUpgrade(5)"><b>Timeline Shift</b><br>Unlock new rank effect at rank 520... (COMING SOON!)<br><br>1.00e141 cash</button>
+        </div>
+        
         <hr id="machineLine" class="locked">
         <p style="margin-top:0px">(Unlock Fused Machines at e1.888e3 Coin)</p>
         <div id="machineDiv" class="locked">
-            <h3 id="machine" style="margin-bottom:10px">You have 0 fused machines</h3>
+            <h3 id="machine" style="margin-bottom:10px">You have 0.00 fused machines</h3>
             <p id="machineEffect" style="margin-top:10px">which are boosting Coin by ^1.00 and Cash by ^1.00</p>
             <button class="prestige" onclick="fusedMachine()" style="background-color:#db89f0" id="machineButton">Use your currency to build 0 fused machines</button>
             <p style="font-size:10px;margin-top:0px">(Buying a fused machine performs a collapse prestige)</p>
@@ -112,9 +123,50 @@
         </div>
     </div>
 
+    <div id="investment" data-tab-content>
+        <h3 id="growthDesc" style="margin-top:15px;margin-bottom:0px">You have 1.00 profit,</h3>
+        <p style="margin-top:0px;font-size:10px">which is multiplying Cash production.</p>
+        <h3 id="growthDesc2">You also have 1.00 growth and a invest cooldown of 10.00 seconds.</h3>
+
+        <div class="flex locked" id="stockDiv1">
+            <div class="card" style="height:140px;">
+                <h2>Default</h2>
+                <p>Change to the default inflation formula.</p>
+                <button id="stock1" onclick="stocks(1)">SELECTED</button>
+            </div>
+            <div class="card" style="height:140px;">
+                <h2>Stable</h2>
+                <p>Change to a more stable version of the investment formula.</p>
+                <button id="stock2" onclick="stocks(2)">Select</button>
+            </div>
+        </div>
+        <div class="flex locked" id="stockDiv2">
+            <div class="card" style="height:140px;">
+                <h2>Volatile</h2>
+                <p>Change to a more volatile version of the investment formula.</p>
+                <button id="stock3" onclick="stocks(3)">Select</button>
+            </div>
+            <div class="card" style="height:140px;">
+                <h2>Random</h2>
+                <p>Use a random investment formula everytime.</p>
+                <button id="stock4" onclick="stocks(4)">Select</button>
+            </div>
+        </div>
+    </div>
+
     <div id="save" data-tab-content>
+        <h1>Save</h1>
+        <div style="display:flex; justify-content: center;">
+            <button id="autosave" class="prestige" onclick="switchAutosave()" style="font-size:15px">Autosave: On</button>
+            <button class="prestige" onclick="saveVariablesToStorage()" style="font-size:15px">Save</button>
+        </div>
         <h3>Press the button below to DELETE YOUR SAVE FILE. (Reset literally EVERYTHING)</h3>
-        <button class="prestige" onclick="deleteSaveFile()" style="font-size:20px">Delete Save File</button>
+        <button class="prestige" onclick="deleteSaveFile()" style="font-size:20px">Delete Save File</button><br><hr><br>
+
+        <h1>Changelogs</h1>
+        <h3>v.0.3.0-alpha</h3>
+        <p>-Formatting now uses Eternal-Notations by MathCookie17 on GitHub</p>
+        <p>-Added Investment & Cash Upgrades</p>
     </div>
 
     <script type="module">

@@ -16,11 +16,37 @@ function saveVariablesToStorage() {
     localStorage.setItem("cashChallangeCompleted", cashChallangeCompleted)
     localStorage.setItem("cashChallangeActive", cashChallangeActive)
     localStorage.setItem("savedKnowledge", savedKnowledge)
+    localStorage.setItem("profit", profit)
+    localStorage.setItem("growth", growth)
+    localStorage.setItem("cooldown", cooldown)
     localStorage.setItem("collapseUpgrades", JSON.stringify(collapseUpgrades))
+    localStorage.setItem("cashUpgrades", JSON.stringify(cashUpgrades))
 }
-setInterval(saveVariablesToStorage, 1000)
+
+var autosave = true
+
+function switchAutosave() {
+    autosave = !autosave
+    localStorage.setItem("autosave", autosave)
+
+    setAutosave()
+}
+
+function setAutosave() {
+    if (autosave) {
+        autosaveInterval = setInterval(saveVariablesToStorage, 1000)
+        changeElement("autosave", "Autosave: On")
+    } else {
+        clearInterval(autosaveInterval)
+        changeElement("autosave", "Autosave: Off")
+    }
+}
+
 
 function loadVariables() {
+    if (localStorage.getItem("autosave") !== null) {
+        autosave = new Decimal(localStorage.getItem("autosave"))
+    }
     if (localStorage.getItem("coin") !== null) {
         coin = new Decimal(localStorage.getItem("coin"))
     }
@@ -72,8 +98,20 @@ function loadVariables() {
     if (localStorage.getItem("savedKnowledge") !== null) {
         savedKnowledge = new Decimal(localStorage.getItem("savedKnowledge"))
     }
+    if (localStorage.getItem("profit") !== null) {
+        profit = new Decimal(localStorage.getItem("profit"))
+    }
+    if (localStorage.getItem("growth") !== null) {
+        growth = new Decimal(localStorage.getItem("growth"))
+    }
+    if (localStorage.getItem("cooldown") !== null) {
+        cooldown = new Decimal(localStorage.getItem("cooldown"))
+    }
     if (localStorage.getItem("collapseUpgrades") !== null) {
         collapseUpgrades = JSON.parse(localStorage.getItem("collapseUpgrades"))
+    }
+    if (localStorage.getItem("cashUpgrades") !== null) {
+        cashUpgrades = JSON.parse(localStorage.getItem("cashUpgrades"))
     }
 
     timeout = setTimeout(function() {
@@ -90,10 +128,15 @@ function loadVariables() {
   
     clearInterval(updateVar)
     updateVar = setInterval(update, new Decimal(1000).div(tickspeed))
+
+    clearInterval(investmentVar)
+    investmentVar = setInterval(investment, cooldown)
 }
 window.onload = loadVariables()
+window.onload = setAutosave()
 
 function deleteSaveFile() {
     localStorage.clear()
     location.reload()
 }
+
