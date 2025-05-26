@@ -206,6 +206,7 @@ function rankUpgrade(reset=false) {
             if (rankBought.gte(30)) mult = Decimal.pow(10, rankBought.sub(29).max(0))
             rankCost = rankCost.times(mult)
             rankUpdate() 
+            //CU 9
             if (!collapseUpgrades[9]) {
                 coin = new Decimal(0)
                 coinBest = new Decimal(0)
@@ -485,7 +486,7 @@ function enhancer(update=false) {
 var cashInflationBought = new Decimal(0)
 function cashInflation() {
     var cost = Decimal.pow(10, cashInflationBought)
-    if (cashInflationBought.gte(75)) cost = Decimal.pow(10, cashInflationBought.times(5).sub(259).max(1))
+    if (cashInflationBought.gte(10)) cost = Decimal.pow(10, cashInflationBought.times(2).sub(19).max(1)).times(1e10)
     if (cash.gte(cost)) {
         cashInflationBought = cashInflationBought.add(1)
         var cost = Decimal.pow(10, cashInflationBought)
@@ -591,26 +592,28 @@ function updateCash() {
 
 //Investmentment
 function investment() {
-    if (curStock.eq(1)) {
-        if (profit.lt(Decimal.pow(10, growth))) profit = profit.times(new Decimal(Math.random()).times(new Decimal(1.01).times(growth).sub(new Decimal(0.99).div(growth.times(0.9).max(1)))).add(new Decimal(0.99).div(growth)))
-        else profit = profit.times(new Decimal(Math.random()).times(new Decimal(1).sub(new Decimal(0.99).div(growth.times(0.9).max(1)))).add(new Decimal(0.99).div(growth)))
-    } else if (curStock.eq(2)) {
-        if (profit.lt(Decimal.pow(10, growth))) profit = profit.times(new Decimal(Math.random()).times(new Decimal(1.01).times(growth.pow(0.7).div(2)).sub(new Decimal(0.99).div(growth.pow(0.7).div(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(0.7).div(2))))
-        else profit = profit.times(new Decimal(Math.random()).times(new Decimal(1).sub(new Decimal(0.99).div(growth.pow(0.7).div(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(0.7).div(2))))
-    } else if (curStock.eq(3)) {
-        if (profit.lt(Decimal.pow(10, growth))) profit = profit.times(new Decimal(Math.random()).times(new Decimal(1.01).times(growth.pow(1.3).times(2)).sub(new Decimal(0.99).div(growth.pow(1.3).times(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(1.3).times(2))))
-        else profit = profit.times(new Decimal(Math.random()).times(new Decimal(1).sub(new Decimal(0.99).div(growth.pow(1.3).times(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(1.3).times(2))))
-    } else if (curStock.eq(4)) {
-        tmpStockId = new Decimal(Math.floor(Math.random()*3)+1)
-        if (tmpStockId.eq(1)) {
+    if (cashUpgrades[1]) {
+        if (curStock.eq(1)) {
             if (profit.lt(Decimal.pow(10, growth))) profit = profit.times(new Decimal(Math.random()).times(new Decimal(1.01).times(growth).sub(new Decimal(0.99).div(growth.times(0.9).max(1)))).add(new Decimal(0.99).div(growth)))
             else profit = profit.times(new Decimal(Math.random()).times(new Decimal(1).sub(new Decimal(0.99).div(growth.times(0.9).max(1)))).add(new Decimal(0.99).div(growth)))
-        } else if (tmpStockId.eq(2)) {
+        } else if (curStock.eq(2)) {
             if (profit.lt(Decimal.pow(10, growth))) profit = profit.times(new Decimal(Math.random()).times(new Decimal(1.01).times(growth.pow(0.7).div(2)).sub(new Decimal(0.99).div(growth.pow(0.7).div(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(0.7).div(2))))
             else profit = profit.times(new Decimal(Math.random()).times(new Decimal(1).sub(new Decimal(0.99).div(growth.pow(0.7).div(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(0.7).div(2))))
-        } else if (tmpStockId.eq(3)) {
+        } else if (curStock.eq(3)) {
             if (profit.lt(Decimal.pow(10, growth))) profit = profit.times(new Decimal(Math.random()).times(new Decimal(1.01).times(growth.pow(1.3).times(2)).sub(new Decimal(0.99).div(growth.pow(1.3).times(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(1.3).times(2))))
             else profit = profit.times(new Decimal(Math.random()).times(new Decimal(1).sub(new Decimal(0.99).div(growth.pow(1.3).times(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(1.3).times(2))))
+        } else if (curStock.eq(4)) {
+            tmpStockId = new Decimal(Math.floor(Math.random()*3)+1)
+            if (tmpStockId.eq(1)) {
+                if (profit.lt(Decimal.pow(10, growth))) profit = profit.times(new Decimal(Math.random()).times(new Decimal(1.01).times(growth).sub(new Decimal(0.99).div(growth.times(0.9).max(1)))).add(new Decimal(0.99).div(growth)))
+                else profit = profit.times(new Decimal(Math.random()).times(new Decimal(1).sub(new Decimal(0.99).div(growth.times(0.9).max(1)))).add(new Decimal(0.99).div(growth)))
+            } else if (tmpStockId.eq(2)) {
+                if (profit.lt(Decimal.pow(10, growth))) profit = profit.times(new Decimal(Math.random()).times(new Decimal(1.01).times(growth.pow(0.7).div(2)).sub(new Decimal(0.99).div(growth.pow(0.7).div(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(0.7).div(2))))
+                else profit = profit.times(new Decimal(Math.random()).times(new Decimal(1).sub(new Decimal(0.99).div(growth.pow(0.7).div(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(0.7).div(2))))
+            } else if (tmpStockId.eq(3)) {
+                if (profit.lt(Decimal.pow(10, growth))) profit = profit.times(new Decimal(Math.random()).times(new Decimal(1.01).times(growth.pow(1.3).times(2)).sub(new Decimal(0.99).div(growth.pow(1.3).times(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(1.3).times(2))))
+                else profit = profit.times(new Decimal(Math.random()).times(new Decimal(1).sub(new Decimal(0.99).div(growth.pow(1.3).times(2).times(0.9).max(1)))).add(new Decimal(0.99).div(growth.pow(1.3).times(2))))
+            }
         }
     }
 }
