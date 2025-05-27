@@ -302,6 +302,19 @@ function collapse(reset=false) {
             rankEffect = "Nothing"
             changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, rankBought).times(100))+" Coins")
             changeElement("rankEffect", rankEffect)
+            setTimeout(function() {
+              if (!collapseUpgrades[9]) {
+                coin = new Decimal(0)
+                coinBest = new Decimal(0)
+                inflation = new Decimal(0)
+                tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
+                tickspeedBought = new Decimal(0)
+                }
+                if (cashChallangeActive) changeElement("coins", "You have "+format(coin)+" coins <span style=\"color:red\">inside of Cash Bank</span>.")
+                else changeElement("coins", "You have "+format(coin)+" coins.")
+                changeElement("inflation", format(coinBest)+" best coins is translated into a "+format(inflation.times(100))+"% inflation, which is directly boosting your coin production by "+format(inflation.add(1))+"x.")
+            }, 10);
+
         } else {
             alert("You need Rank 30 to use this button!")
         }
