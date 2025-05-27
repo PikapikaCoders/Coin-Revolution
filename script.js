@@ -33,6 +33,7 @@ function update() {
         if (cashChallangeActive) changeElement("coins", "You have "+format(coin)+" coins <span style=\"color:red\">inside of Cash Bank</span>.")
         else changeElement("coins", "You have "+format(coin)+" coins.")
         changeElement("inflation", format(coinBest)+" best coins is translated into a "+format(inflation.times(100))+"% inflation, which is directly boosting your coin production by "+format(inflation.add(1))+"x.")
+        justCollapse = false
     }
     var tickMult = new Decimal(1)
     if (tickspeed.gte(1000)) tickMult = tickMult.times(tickspeed.div(1000))
