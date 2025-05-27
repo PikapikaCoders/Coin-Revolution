@@ -9,7 +9,6 @@ var collapseTick = new Decimal(0)
 //Cash
 var cash = new Decimal(0)
 var machine = new Decimal(0)
-var machineMax = new Decimal(3)
 var machineGain = new Decimal(0)
 //Investment
 var profit = new Decimal(1)
@@ -19,11 +18,22 @@ var curStock = new Decimal(1)
 
 //Unsaved Variables
 var knowledgeGain = new Decimal(0)
-var machineRevert = false
-var investRate = new Decimal(1)
+var justCollapse = false
 
 //Update
 function update() {
+    if (justCollapse) {
+        if (!collapseUpgrades[9]) {
+            coin = new Decimal(0)
+            coinBest = new Decimal(0)
+            inflation = new Decimal(0)
+            tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
+            tickspeedBought = new Decimal(0)
+        }
+        if (cashChallangeActive) changeElement("coins", "You have "+format(coin)+" coins <span style=\"color:red\">inside of Cash Bank</span>.")
+        else changeElement("coins", "You have "+format(coin)+" coins.")
+        changeElement("inflation", format(coinBest)+" best coins is translated into a "+format(inflation.times(100))+"% inflation, which is directly boosting your coin production by "+format(inflation.add(1))+"x.")
+    }
     var tickMult = new Decimal(1)
     if (tickspeed.gte(1000)) tickMult = tickMult.times(tickspeed.div(1000))
     collapseTick = collapseTick.add(tickMult)
@@ -302,18 +312,7 @@ function collapse(reset=false) {
             rankEffect = "Nothing"
             changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, rankBought).times(100))+" Coins")
             changeElement("rankEffect", rankEffect)
-            setTimeout(function() {
-              if (!collapseUpgrades[9]) {
-                coin = new Decimal(0)
-                coinBest = new Decimal(0)
-                inflation = new Decimal(0)
-                tickspeed = Decimal.pow(getTickspeedBase(), getFreeTickspeed())
-                tickspeedBought = new Decimal(0)
-                }
-                if (cashChallangeActive) changeElement("coins", "You have "+format(coin)+" coins <span style=\"color:red\">inside of Cash Bank</span>.")
-                else changeElement("coins", "You have "+format(coin)+" coins.")
-                changeElement("inflation", format(coinBest)+" best coins is translated into a "+format(inflation.times(100))+"% inflation, which is directly boosting your coin production by "+format(inflation.add(1))+"x.")
-            }, 10);
+            justCollapse = true
 
         } else {
             alert("You need Rank 30 to use this button!")
@@ -328,6 +327,7 @@ function collapse(reset=false) {
         rankEffect = "Nothing"
         changeElement("rankDesc", "Current Effect: "+format(rankBought)+" ranks<br>Next Effect: "+nextEffect+"<br>Cost: "+format(Decimal.pow(10, rankBought).times(100))+" Coins")
         changeElement("rankEffect", rankEffect)
+        justCollapse = true
     }
 }
 
@@ -637,4 +637,31 @@ function stocks(id) {
     changeElement("stock"+id, "SELECTED")
     changeElement("stock"+curStock, "Select")
     curStock = new Decimal(id)
+}
+
+//Time Fragment
+function timeFragment(reset=false) {
+    if (!reset) {
+        collapse(true)
+        knowledge = new Decimal(0)
+        collapseTick = new Decimal(0)
+        cash = new Decimal(0)
+        machine = new Decimal(0)
+        machineGain = new Decimal(0)
+        profit = new Decimal(1)
+        growth = new Decimal(1)
+        cooldown = new Decimal(10000)
+        curStock = new Decimal(1)
+    } else {
+        collapse(true)
+        knowledge = new Decimal(0)
+        collapseTick = new Decimal(0)
+        cash = new Decimal(0)
+        machine = new Decimal(0)
+        machineGain = new Decimal(0)
+        profit = new Decimal(1)
+        growth = new Decimal(1)
+        cooldown = new Decimal(10000)
+        curStock = new Decimal(1)
+    }
 }
